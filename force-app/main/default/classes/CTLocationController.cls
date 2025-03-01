@@ -17,7 +17,7 @@ public with sharing class CTLocationController {
         String query = LOCATION_QUERY + ' ORDER BY Status_Update_Date__c DESC NULLS LAST LIMIT 100';
         List<Location__c> locations = Database.query(query);
 
-        if (locations != null && locations.size()) {
+        if (locations != null && locations.size() > 0) {
             return locations;
         }
 
@@ -35,7 +35,7 @@ public with sharing class CTLocationController {
         String query = LOCATION_QUERY + ' WHERE Name LIKE :searchTerm OR Pincode__c LIKE :searchTerm OR Address__c LIKE :searchTerm ORDER BY Status_Update_Date__c DESC';
         List<Location__c> locations = Database.query(query);
 
-        if (locations != null && locations.size()) {
+        if (locations != null && locations.size() > 0) {
             return locations;
         }
 
@@ -52,7 +52,7 @@ public with sharing class CTLocationController {
         String query = LOCATION_QUERY + ' WHERE Id = :locationId';
         List<Location__c> locations = Database.query(query);
 
-        if (locations != null && locations.size()) {
+        if (!locations.isEmpty() && locations.size() > 0) {
             return locations[0];
         }
 
