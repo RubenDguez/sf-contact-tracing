@@ -35,7 +35,6 @@ public with sharing class CTPersonController {
         return personList;
     }
 
-    
     /**
     * @description 
     * @author argenis.dominguez@argenis.dominguez.com | 2025-02-28 
