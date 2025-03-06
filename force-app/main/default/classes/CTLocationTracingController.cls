@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : argenis.dominguez@argenis.dominguez.com
  * @group             : 
- * @last modified on  : 2025-03-01
+ * @last modified on  : 2025-03-05
  * @last modified by  : argenis.dominguez@argenis.dominguez.com
 **/
 public with sharing class CTLocationTracingController {
@@ -60,5 +60,63 @@ public with sharing class CTLocationTracingController {
         String query = LOCATION_TRACING_QUERY + ' WHERE Id IN :locationIds AND Person__r.Health_Status__c = :personHealth AND Visit_Date__c = LAST_N_DAYS:10';
 
         return getLocations(query);
+    }
+
+    /**
+    * @description 
+    * @author argenis.dominguez@argenis.dominguez.com | 2025-03-05 
+    * @param newLocationTraces 
+    * @return List<Location_Tracing__c> 
+    **/
+    private static List<Location_Tracing__c> getCheckDuplicatesExistingRecords(List<Location_Tracing__c> newLocationTraces) {
+        List<Location_Tracing__c> existingRecords = new List<Location_Tracing__c>();
+        set<Id> locationsIds = new Set<Id>();
+        set<Id> personsIds = new Set<Id>();
+
+        for (Location_Tracing__c trace : newLocationTraces) {
+            locationsIds.add(trace.Location__c);
+            personsIds.add(trace.Person__c);
+        }
+
+        if (Schema.sObjectType.Location_Tracing__c.fields.Location__c.isAccessible() && Schema.sObjectType.Location_Tracing__c.fields.Person__c.isAccessible()) {
+            existingRecords = [SELECT Id, Location__c FROM Location_Tracing__c WHERE Location__c IN :locationsIds AND Person__c IN :personsIds];
+        }
+
+        if (existingRecords == null || existingRecords.size() == 0) {
+            return null;
+        }
+
+        return existingRecords;
+    }
+
+    /**
+    * @description 
+    * @author argenis.dominguez@argenis.dominguez.com | 2025-03-05 
+    * @param newLocationTraces 
+    * @return List<Location_Tracing__c> 
+    **/
+    public static List<Location_Tracing__c> checkDuplicates(List<Location_Tracing__c> newLocationTraces) {
+        List<Location_Tracing__c> duplicates = new List<Location_Tracing__c>();
+        Map<Id, Set<Id>> mapOfExistingRecords = new Map<Id, Set<Id>>();
+
+        List<Location_Tracing__c> existingRecords = getCheckDuplicatesExistingRecords(newLocationTraces);
+
+        if (existingRecords != null) {
+            for (Location_Tracing__c trace : existingRecords) {
+                if (!mapOfExistingRecords.containsKey(trace.Location__c)) {
+                    mapOfExistingRecords.put(trace.Location__c, new Set<Id>());
+                }
+
+                mapOfExistingRecords.get(trace.Location__c).add(trace.Person__c);
+            }
+
+            for (Location_Tracing__c trace : newLocationTraces) {
+                if (mapOfExistingRecords.containsKey(trace.Location__c) && mapOfExistingRecords.get(trace.Location__c).contains(trace.Person__c)) {
+                    duplicates.add(trace);
+                }
+            }
+        }
+
+        return duplicates;
     }
 }
