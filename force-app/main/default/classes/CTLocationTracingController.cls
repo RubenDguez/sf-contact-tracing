@@ -79,7 +79,7 @@ public with sharing class CTLocationTracingController {
         }
 
         if (Schema.sObjectType.Location_Tracing__c.fields.Location__c.isAccessible() && Schema.sObjectType.Location_Tracing__c.fields.Person__c.isAccessible()) {
-            existingRecords = [SELECT Id, Location__c FROM Location_Tracing__c WHERE Location__c IN :locationsIds AND Person__c IN :personsIds];
+            existingRecords = [SELECT Id, Location__c, Person__c FROM Location_Tracing__c WHERE Location__c IN :locationsIds AND Person__c IN :personsIds];
         }
 
         if (existingRecords == null || existingRecords.size() == 0) {
