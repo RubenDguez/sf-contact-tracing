@@ -1,16 +1,23 @@
+/**
+ * @description       : 
+ * @author            : argenis.dominguez@argenis.dominguez.com
+ * @group             : 
+ * @last modified on  : 2025-04-03
+ * @last modified by  : argenis.dominguez@argenis.dominguez.com
+**/
 trigger ContactTrigger on Contact (after insert, after update, after delete, after undelete) {
     switch on Trigger.operationType {
         when AFTER_INSERT {
-            ContractTriggerHandler.afterInsert(Trigger.new);
+            ContactTriggerHandler.afterInsert(Trigger.new);
         }
         when AFTER_UPDATE {
-            ContractTriggerHandler.afterUpdate(Trigger.new);
+            ContactTriggerHandler.afterUpdate(Trigger.new, Trigger.oldMap);
         }
         when AFTER_DELETE {
-            ContractTriggerHandler.afterDelete(Trigger.old);
+            ContactTriggerHandler.afterDelete(Trigger.old);
         }
         when AFTER_UNDELETE {
-            ContractTriggerHandler.afterUndelete(Trigger.new);
+            ContactTriggerHandler.afterUndelete(Trigger.new);
         }
     }
 }
